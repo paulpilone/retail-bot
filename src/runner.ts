@@ -20,7 +20,7 @@ interface TargetItem {
 const targetItems: TargetItem[] = [
     {
         // PE Surprise Box
-        title: 'PE SurprisTe Box',
+        title: 'PE Surprise Box',
         url: 'https://www.target.com/p/2025-pokemon-scarlet-violet-s8-5-prismatic-evolutions-surprise-box/-/A-94336414',
         id: '94336414',
     },

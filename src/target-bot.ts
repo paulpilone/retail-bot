@@ -1,6 +1,6 @@
-import puppeteer from "puppeteer";
-
-import { randomUserAgent } from "./browser-utils";
+import puppeteer from 'puppeteer-extra';
+import StealthPlugin from 'puppeteer-extra-plugin-stealth';
+puppeteer.use(StealthPlugin())
 
 /**
  * Checks if an item is in stock at Target.
@@ -11,16 +11,19 @@ import { randomUserAgent } from "./browser-utils";
 export async function isInStock(itemUrl: string): Promise<boolean> {
     // TODO: Get this working in headless mode.
     const browser = await puppeteer.launch({
-        headless: false,
+        // headless: false,
+        // args: [
+        //     '--window-size=1920,1080',  
+        // ],
+        // defaultViewport: null
         args: [
-            '--window-size=1920,1080',  
-        ],
-        defaultViewport: null
+            '--user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+        ]
     });
     
     const page = await browser.newPage();
     // page.setUserAgent(randomUserAgent());
-    page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36');
+    // page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36');
 
     try {
         await page.goto(itemUrl, { waitUntil: 'networkidle0' });

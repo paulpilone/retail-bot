@@ -25,4 +25,14 @@ npm install
 
 ## Tests
 
+```sh
+npm run test
+```
+
+## Usage
+
+```sh
+npm run bot
+```
+
 ## Deployments
