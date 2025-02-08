@@ -1,7 +1,8 @@
-// import notifier from 'node-notifier';
 import commandLineArgs from 'command-line-args';
 import colors from 'colors';
 import notifier from 'node-notifier';
+import puppeteer from 'puppeteer-extra';
+import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 
 import { isInStock } from "./target-bot";
 
@@ -58,30 +59,49 @@ function notify(attrs: NotificationAttributes) {
 }
 
 async function main() {
-    while(true) {
-        // TODO: Instead of iterating over these can we just use a single browser with multiple pages to do it quicker?
-        for (const targetItem of targetItems) {
-            console.log(`Checking ${targetItem.title} at Target...`);
+    // Configure Puppeteer to be stealthy
+    puppeteer.use(StealthPlugin())
 
-            const isInStockTarget = await isInStock(
-                targetItem.url
-            );
+    const browser = await puppeteer.launch({
+        headless: true,
+        args: [
+            '--window-size=1920,1080',  
+            '--user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+        ],
+        defaultViewport: null,
+    });
 
-            if (isInStockTarget) {
-                const message = `Hurry! ${targetItem.title} is in stock at Target!\n`;
-                console.log(colors.green(message));
-                if (options.notify) {
-                    notify({ ...targetItem, message });
+    try {
+        while(true) {
+            // TODO: Instead of iterating over these can we just use a single browser with multiple pages to do it quicker?
+            for (const targetItem of targetItems) {
+                console.log(`Checking ${targetItem.title} at Target...`);
+
+                const isInStockTarget = await isInStock(
+                    browser,
+                    targetItem.url
+                );
+
+                if (isInStockTarget) {
+                    const message = `Hurry! ${targetItem.title} is in stock at Target!\n`;
+                    console.log(colors.green(message));
+                    if (options.notify) {
+                        notify({ ...targetItem, message });
+                    }
+                } else {
+                    console.log(colors.red(`No rush. ${targetItem.title} is still out of stock.\n`));
                 }
-            } else {
-                console.log(colors.red(`No rush. ${targetItem.title} is still out of stock.\n`));
             }
-        }
 
-        await new Promise(resolve => setTimeout(
-            resolve, 
-            Math.floor(Math.random() * (15000 - 8000 + 1)) + 8000
-        ));
+            await new Promise(resolve => setTimeout(
+                resolve, 
+                Math.floor(Math.random() * (15000 - 8000 + 1)) + 8000
+            ));
+        }
+    } catch (err) {
+        console.log(`Got an error: ${err}`);
+    } finally {
+        await browser.close();
     }
 };
 

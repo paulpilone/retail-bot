@@ -1,6 +1,4 @@
-import puppeteer from 'puppeteer-extra';
-import StealthPlugin from 'puppeteer-extra-plugin-stealth';
-puppeteer.use(StealthPlugin())
+import { Browser } from "puppeteer";
 
 /**
  * Checks if an item is in stock at Target.
@@ -8,23 +6,9 @@ puppeteer.use(StealthPlugin())
  * @param itemUrl - The Target URL of the item.
  * @returns {Promise<boolean>} - True if the item is in stock, false otherwise.
  */
-export async function isInStock(itemUrl: string): Promise<boolean> {
-    // TODO: Get this working in headless mode.
-    const browser = await puppeteer.launch({
-        // headless: false,
-        // args: [
-        //     '--window-size=1920,1080',  
-        // ],
-        // defaultViewport: null
-        args: [
-            '--user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
-        ]
-    });
-    
+export async function isInStock(browser: Browser, itemUrl: string): Promise<boolean> {
     const page = await browser.newPage();
-    // page.setUserAgent(randomUserAgent());
-    // page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36');
-
+    
     try {
         await page.goto(itemUrl, { waitUntil: 'networkidle0' });
 
@@ -43,6 +27,6 @@ export async function isInStock(itemUrl: string): Promise<boolean> {
         console.error('Error checking button:', error);
         throw error;
     } finally {
-        await browser.close();
+        page.close();
     }
 }
