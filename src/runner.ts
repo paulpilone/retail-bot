@@ -1,13 +1,20 @@
+// import notifier from 'node-notifier';
+import commandLineArgs from 'command-line-args';
+import colors from 'colors';
+import notifier from 'node-notifier';
+
 import { isInStock } from "./target-bot";
+
+const optionDefinitions = [
+    { name: 'notify', alias: 'n', type: Boolean, defaultOption: false },
+];
+const options = commandLineArgs(optionDefinitions)
 
 interface TargetItem {
     title: string,
     url: string,
     id: string
 };
-
-// Time to wait before scraping again.
-const refereshTimeout = 15000;
 
 // TODO: Read this from a file instead.
 const targetItems: TargetItem[] = [
@@ -28,8 +35,27 @@ const targetItems: TargetItem[] = [
         title: 'PE Binder Collection',
         url: 'https://www.target.com/p/2025-pokemon-prismatic-evolutions-binder-collection/-/A-94300066',
         id: '94300066',
-    }
+    },
 ];
+
+interface NotificationAttributes {
+    title: string,
+    message: string,
+    url: string
+}
+
+/**
+ * 
+ * @param attrs 
+ */
+function notify(attrs: NotificationAttributes) {
+    notifier.notify({
+        title: `${attrs.title}`,
+        message: attrs.message,
+        open: attrs.url,
+        sound: true
+    });
+}
 
 async function main() {
     while(true) {
@@ -41,10 +67,21 @@ async function main() {
                 targetItem.url
             );
 
-            console.log(`In stock? ${isInStockTarget}`);
+            if (isInStockTarget) {
+                const message = `Hurry! ${targetItem.title} is in stock at Target!\n`;
+                console.log(colors.green(message));
+                if (options.notify) {
+                    notify({ ...targetItem, message });
+                }
+            } else {
+                console.log(colors.red(`No rush. ${targetItem.title} is still out of stock.\n`));
+            }
         }
 
-        await new Promise(resolve => setTimeout(resolve, refereshTimeout));
+        await new Promise(resolve => setTimeout(
+            resolve, 
+            Math.floor(Math.random() * (15000 - 8000 + 1)) + 8000
+        ));
     }
 };
 

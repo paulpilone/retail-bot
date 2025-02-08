@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "bot": "npx tsx src/runner.ts",
     "lint": "eslint .",
     "lint:fix": "eslint src/**/*.ts --fix",
     "test": "jest"
@@ -23,7 +24,9 @@
     "@babel/core": "^7.26.7",
     "@babel/preset-env": "^7.26.7",
     "@babel/preset-typescript": "^7.26.0",
+    "@types/command-line-args": "^5.2.3",
     "@types/jest": "^29.5.14",
+    "@types/node-notifier": "^8.0.5",
     "@typescript-eslint/eslint-plugin": "^8.23.0",
     "@typescript-eslint/parser": "^8.23.0",
     "babel-jest": "^29.7.0",
@@ -39,6 +42,9 @@
     "typescript-eslint": "^8.23.0"
   },
   "dependencies": {
+    "colors": "^1.4.0",
+    "command-line-args": "^6.0.1",
+    "node-notifier": "^10.0.1",
     "puppeteer": "^24.2.0"
   }
 }
