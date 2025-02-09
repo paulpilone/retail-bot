@@ -1,10 +1,12 @@
 import commandLineArgs from 'command-line-args';
 import colors from 'colors';
 import notifier from 'node-notifier';
+import pMap from 'p-map';
+import { Browser } from 'puppeteer';
 import puppeteer from 'puppeteer-extra';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 
-import { isInStock } from "./target-bot";
+import { isInStock } from "./target-bot.js";
 
 const optionDefinitions = [
     { name: 'notify', alias: 'n', type: Boolean, defaultOption: false },
@@ -37,6 +39,12 @@ const targetItems: TargetItem[] = [
         url: 'https://www.target.com/p/2025-pokemon-prismatic-evolutions-binder-collection/-/A-94300066',
         id: '94300066',
     },
+    // {
+    //     // Test paper towels hoping they're in stock
+    //     title: 'Paper towels',
+    //     url: 'https://www.target.com/p/make-a-size-paper-towels-150-sheets-up-up/-/A-79762915?preselect=79727133',
+    //     id: '79762915',
+    // },
 ];
 
 interface NotificationAttributes {
@@ -54,14 +62,28 @@ function notify(attrs: NotificationAttributes) {
         title: `${attrs.title}`,
         message: attrs.message,
         open: attrs.url,
-        sound: true
+        sound: true,
+        timeout: 30
     });
+}
+
+async function checkInStockTarget(
+    browser: Browser, 
+    item: TargetItem
+): Promise<boolean> {
+    console.log(`Checking ${item.title} at Target...`);
+    return await isInStock(
+        browser,
+        item.url
+    );
 }
 
 async function main() {
     // Configure Puppeteer to be stealthy
+    // @ts-expect-error There are some weird import things going on with puppeteer extra and ESM
     puppeteer.use(StealthPlugin())
 
+    // @ts-expect-error There are some weird import things going on with puppeteer extra and ESM
     const browser = await puppeteer.launch({
         headless: true,
         args: [
@@ -73,26 +95,27 @@ async function main() {
 
     try {
         while(true) {
-            // TODO: Instead of iterating over these can we just use a single browser with multiple pages to do it quicker?
-            for (const targetItem of targetItems) {
-                console.log(`Checking ${targetItem.title} at Target...`);
-
-                const isInStockTarget = await isInStock(
-                    browser,
-                    targetItem.url
-                );
-
-                if (isInStockTarget) {
-                    const message = `Hurry! ${targetItem.title} is in stock at Target!\n`;
+            const targetResults: boolean[] = await pMap(
+                targetItems,
+                async (item: TargetItem) => {
+                    return await checkInStockTarget(browser, item)
+                },
+                { concurrency: 3 }
+            );
+            
+            targetResults.forEach((isInStock, idx) => {
+                const item = targetItems[idx];
+                if (isInStock) {
+                    const message = `Hurry! ${item.title} is in stock at Target!`;
                     console.log(colors.green(message));
                     if (options.notify) {
-                        notify({ ...targetItem, message });
+                        notify({ ...item, message });
                     }
                 } else {
-                    console.log(colors.red(`No rush. ${targetItem.title} is still out of stock.\n`));
+                    console.log(colors.red(`No rush. ${item.title} is still out of stock.`));
                 }
-            }
-
+            });
+        
             await new Promise(resolve => setTimeout(
                 resolve, 
                 Math.floor(Math.random() * (15000 - 8000 + 1)) + 8000
