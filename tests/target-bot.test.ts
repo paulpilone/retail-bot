@@ -80,7 +80,20 @@ describe('target-bot', () => {
             );
     
             expect(result).toBe(true);
-        })
+        });
+
+        test.only('it should respond false for an out of stock Find Alternative item', async () => {
+            const result = await isInStock(
+                browser,
+                {
+                    title: 'Out of Stock Find Alternative',
+                    url: 'https://www.target.com/p/pokemon-tcg-scarlet-violet-prismatic-evolutions-mini-tin-display-8ct-display/-/A-1001559212',
+                    id: '1001559212',
+                },
+            );
+    
+            expect(result).toBe(false);
+        });
     });
 });
 

@@ -4,7 +4,7 @@ import { TargetItem } from './types.js';
 
 // FIXME: This code was borrowed from the internet. It works but let's clean it up.
 const waitTillHTMLRendered = async (page: Page, timeout = 30000) => {
-    const checkDurationMsecs = 2000;
+    const checkDurationMsecs = 1000;
     const maxChecks = timeout / checkDurationMsecs;
     let lastHTMLSize = 0;
     let checkCounts = 1;
@@ -45,8 +45,9 @@ const waitTillHTMLRendered = async (page: Page, timeout = 30000) => {
  */
 export async function isInStock(browser: Browser, item: TargetItem): Promise<boolean> {
     const page = await browser.newPage();
-    // page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36')
+    page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36')
     
+    // Rejecting images seems to cause Target pages to hang...
     // await page.setRequestInterception(true);
     // page.on('request', request => {
     //   if (request.resourceType() === 'image') {
@@ -63,7 +64,7 @@ export async function isInStock(browser: Browser, item: TargetItem): Promise<boo
         try {
             const shipButton = await page.waitForSelector(
                 'button[data-test="fulfillment-cell-shipping"]', 
-                { visible: true, timeout: 5000 }
+                { visible: true, timeout: 3000 }
             );
             await shipButton?.click();
         } catch {
