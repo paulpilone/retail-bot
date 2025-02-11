@@ -6,18 +6,20 @@ import { Browser } from 'puppeteer';
 import puppeteer from 'puppeteer-extra';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 
-import { isInStock } from "./target-bot.js";
+import { isInStock } from './target-bot.js';
+import { TargetItem } from './types.js';
 
 const optionDefinitions = [
     { name: 'notify', alias: 'n', type: Boolean, defaultOption: false },
+    // TODO: Do something with debug mode (logs, screenshots, etc.)
+    { name: 'debug', alias: 'd', type: Boolean, defaultOption: false},
 ];
-const options = commandLineArgs(optionDefinitions)
+const options = commandLineArgs(optionDefinitions);
 
-interface TargetItem {
-    title: string,
-    url: string,
-    id: string
-};
+const minScrapeDelay = 5000;
+const maxScrapeDelay = 10000;
+
+const browserConcurrency = 1;
 
 // TODO: Read this from a file instead.
 const targetItems: TargetItem[] = [
@@ -45,6 +47,12 @@ const targetItems: TargetItem[] = [
     //     url: 'https://www.target.com/p/make-a-size-paper-towels-150-sheets-up-up/-/A-79762915?preselect=79727133',
     //     id: '79762915',
     // },
+    {
+        // PE Booster Bundle
+        title: 'PE Booster Bundle',
+        url: 'https://www.target.com/p/pok-233-mon-trading-card-game-scarlet-38-violet-prismatic-evolutions-booster-bundle/-/A-93954446',
+        id: '93954446',
+    },
 ];
 
 interface NotificationAttributes {
@@ -74,7 +82,7 @@ async function checkInStockTarget(
     console.log(`Checking ${item.title} at Target...`);
     return await isInStock(
         browser,
-        item.url
+        item
     );
 }
 
@@ -95,30 +103,32 @@ async function main() {
 
     try {
         while(true) {
-            const targetResults: boolean[] = await pMap(
+            await pMap(
                 targetItems,
                 async (item: TargetItem) => {
-                    return await checkInStockTarget(browser, item)
+                    try {
+                        const isInStock = await checkInStockTarget(browser, item);
+                        if (isInStock) {
+                            const message = `\nHurry! ${item.title} is in stock at Target!\n`;
+                            console.log(colors.green(message));
+                            if (options.notify) {
+                                notify({ ...item, message });
+                            }
+                        } else {
+                            console.log(colors.red(`\nNo rush. ${item.title} is still out of stock.\n`));
+                        }
+                    } catch (error) {
+                        console.log(`Got an error checking availability: ${error}`);
+                    } 
                 },
-                { concurrency: 3 }
+                { concurrency: browserConcurrency }
             );
             
-            targetResults.forEach((isInStock, idx) => {
-                const item = targetItems[idx];
-                if (isInStock) {
-                    const message = `Hurry! ${item.title} is in stock at Target!`;
-                    console.log(colors.green(message));
-                    if (options.notify) {
-                        notify({ ...item, message });
-                    }
-                } else {
-                    console.log(colors.red(`No rush. ${item.title} is still out of stock.`));
-                }
-            });
-        
+            const scrapeDelay = Math.floor(Math.random() * (maxScrapeDelay - minScrapeDelay + 1)) + minScrapeDelay;
+            console.log(`Going to sleep for ${scrapeDelay}...`);
             await new Promise(resolve => setTimeout(
                 resolve, 
-                Math.floor(Math.random() * (15000 - 8000 + 1)) + 8000
+                scrapeDelay,
             ));
         }
     } catch (err) {
