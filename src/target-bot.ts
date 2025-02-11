@@ -79,6 +79,7 @@ export async function isInStock(browser: Browser, item: TargetItem): Promise<boo
             }
         );     
     } catch (error) {
+        // TODO: DEBUG screenshot.
         // Take a screenshot if in debug mode.
         await page.screenshot({ path: `tests/screenshots/${item.id}.png`})
 
