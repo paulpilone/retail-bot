@@ -1,12 +1,16 @@
 import type { Config } from "jest";
 
 const config: Config = {
-    preset: 'jest-puppeteer',
-    testMatch: [
-        "<rootDir>/tests/**/*.test.ts",
-    ],
-    testTimeout: 30000,
-    verbose: true,
+  extensionsToTreatAsEsm: ['.ts', '.tsx'],
+  preset: 'jest-puppeteer',
+  testMatch: [
+    "<rootDir>/tests/**/*.test.ts",
+  ],
+  testTimeout: 30000,
+  moduleNameMapper: {
+    "^(\\.\\.?\\/.+)\\.js$": "$1",
+  },
+  verbose: true,
 };
 
 export default config;

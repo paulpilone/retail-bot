@@ -82,7 +82,7 @@ describe('target-bot', () => {
             expect(result).toBe(true);
         });
 
-        test.only('it should respond false for an out of stock Find Alternative item', async () => {
+        test('it should respond false for an out of stock Find Alternative item', async () => {
             const result = await isInStock(
                 browser,
                 {

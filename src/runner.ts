@@ -6,9 +6,11 @@ import { Browser } from 'puppeteer';
 import puppeteer from 'puppeteer-extra';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 
-import { isInStock } from './target-bot.js';
-import { TargetItem } from './types.js';
+import { isInStock as isInStockTarget } from './target-bot.js';
+import { isInStock as isInStockBestBuy } from './target-bot.js';
 import { randomUserAgent } from './browser-utils.js';
+import  { items } from './items.js';
+import { LocalNotificationAttributes } from './types.js';
 
 const optionDefinitions = [
   { name: 'notify', alias: 'n', type: Boolean, defaultOption: false },
@@ -24,57 +26,11 @@ const browserConcurrency = 1;
 // @ts-expect-error There are some weird import things going on with puppeteer extra and ESM
 puppeteer.use(StealthPlugin())
 
-// TODO: Read this from a file instead.
-const targetItems: TargetItem[] = [
-  {
-    // PE Surprise Box
-    title: 'PE Surprise Box',
-    url: 'https://www.target.com/p/2025-pokemon-scarlet-violet-s8-5-prismatic-evolutions-surprise-box/-/A-94336414',
-    id: '94336414',
-  },
-  {
-    // PE ETB
-    title: 'PE ETB',
-    url: 'https://www.target.com/p/2024-pok-scarlet-violet-s8-5-elite-trainer-box/-/A-93954435',
-    id: '93954435',
-  },
-  {
-    // PE Binder Collection
-    title: 'PE Binder Collection',
-    url: 'https://www.target.com/p/2025-pokemon-prismatic-evolutions-binder-collection/-/A-94300066',
-    id: '94300066',
-  },
-  {
-    // PE Booster Bundle
-    title: 'PE Booster Bundle',
-    url: 'https://www.target.com/p/pok-233-mon-trading-card-game-scarlet-38-violet-prismatic-evolutions-booster-bundle/-/A-93954446',
-    id: '93954446',
-  },
-  {
-    // PE Tins
-    title: 'PE Mini Tins',
-    url: 'https://www.target.com/p/pokemon-tcg-scarlet-violet-prismatic-evolutions-mini-tin-display-8ct-display/-/A-1001559212',
-    id: '1001559212',
-  },
-  {
-    // 151 Booster Bundle
-    title: '151 Booster Bundle',
-    url: 'https://www.target.com/p/pokemon-scarlet-violet-s3-5-booster-bundle-box/-/A-88897904',
-    id: '88897904',
-  },
-];
-
-interface NotificationAttributes {
-  title: string,
-  message: string,
-  url: string
-}
-
 /**
  * 
  * @param attrs 
  */
-function notify(attrs: NotificationAttributes) {
+function notify(attrs: LocalNotificationAttributes) {
   notifier.notify({
     title: `${attrs.title}`,
     message: attrs.message,
