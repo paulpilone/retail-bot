@@ -4,7 +4,7 @@ export interface Item {
 };
 
 export interface Listing {
-    retailer: 'target' | 'bestbuy'
+    retailer: 'Target' | 'Best Buy'
     url: string
     id: string
 }
@@ -14,4 +14,9 @@ export interface LocalNotificationAttributes {
   message: string,
   url: string
 }
+
+export enum Retailers {
+  target = 'Target',
+  bestBuy = 'Best Buy',
+};
 
