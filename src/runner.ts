@@ -3,12 +3,10 @@ import colors from 'colors';
 import notifier from 'node-notifier';
 import pMap from 'p-map';
 import { Browser } from 'puppeteer';
-import puppeteer from 'puppeteer-extra';
-import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 
 import { isInStock as isInStockTarget } from './target-scraper.js';
 import { isInStock as isInStockBestBuy } from './best-buy-scraper.js';
-import { randomUserAgent } from './browser-utils.js';
+import { launchBrowser } from './browser-utils.js';
 import  { items } from './items.js';
 import {
   Item,
@@ -19,6 +17,7 @@ import {
 
 const optionDefinitions = [
   { name: 'notify', alias: 'n', type: Boolean, defaultOption: false },
+  { name: 'retailer', alias: 'r', type: String }
 ];
 const options = commandLineArgs(optionDefinitions);
 
@@ -30,10 +29,6 @@ const maxScrapeDelay = 12000;
 // values won't do much.
 const ITEM_CONCURRENCY = 1;
 const LISTING_CONCURRENCY = 1;
-
-// Configure Puppeteer to be stealthy
-// @ts-expect-error There are some weird import things going on with puppeteer extra and ESM
-puppeteer.use(StealthPlugin())
 
 /**
  *
@@ -53,8 +48,12 @@ async function checkItemsInStock(browser: Browser, items: Item[]) {
   await pMap(
     items,
     async (item: Item) => {
+      const filteredListings = options.retailer
+       ? item.listings.filter((listing) => options.retailer === listing.retailer)
+       : item.listings;
+
       await pMap(
-        item.listings,
+        filteredListings,
         async(listing: Listing) => {
           try {
             console.log(`Checking ${item.title} at ${listing.retailer}...\n`);
@@ -92,17 +91,7 @@ async function checkItemsInStock(browser: Browser, items: Item[]) {
 // We should be catching errors from page loads and if it's really bad close the browser and start over.
 async function main() {
   while (true) {
-    // @ts-expect-error There are some weird import things going on with puppeteer extra and ESM
-    const browser: Browser = await puppeteer.launch({
-      headless: true,
-      args: [
-        `--no-sandbox`,
-        `--disable-setuid-sandbox`,
-        '--window-size=1920,1080',
-        `--user-agent=${randomUserAgent()}`,
-      ],
-      defaultViewport: null,
-    });
+    const browser = await launchBrowser();
 
     try {
       await checkItemsInStock(browser, items);

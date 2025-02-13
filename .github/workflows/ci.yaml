@@ -41,7 +41,8 @@ jobs:
           cache: 'npm'
       - run: npm ci
       - run: npm run test
-      - name: Archive test screenshots
+      - name: Archive Test Screenshots
+        if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: test-screenshots
