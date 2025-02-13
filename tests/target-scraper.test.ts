@@ -1,8 +1,9 @@
 import puppeteer from 'puppeteer-extra';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 
-import { isInStock } from '../src/target-bot';
+import { isInStock } from '../src/target-scraper';
 import { Retailers } from '../src/types';
+import { launchTestBrowser } from './test-utils';
 
 puppeteer.use(StealthPlugin());
 
@@ -11,16 +12,7 @@ describe('target-bot', () => {
         let browser;
 
         beforeAll(async () => {
-            browser = await puppeteer.launch({
-                headless: false,
-                args: [
-                    `--no-sandbox`,
-                    `--disable-setuid-sandbox`,
-                    '--window-size=1920,1080',
-                    '--user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
-                ],
-                defaultViewport: null,
-            });
+            browser = launchTestBrowser();
         });
 
         afterAll(async () => {
