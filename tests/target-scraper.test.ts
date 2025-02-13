@@ -12,7 +12,7 @@ describe('target-bot', () => {
         let browser;
 
         beforeAll(async () => {
-            browser = launchTestBrowser();
+            browser = await launchTestBrowser();
         });
 
         afterAll(async () => {

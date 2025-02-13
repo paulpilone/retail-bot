@@ -12,7 +12,7 @@ describe('best-buy-scraper', () => {
     let browser;
 
     beforeAll(async () => {
-      browser = launchTestBrowser();
+      browser = await launchTestBrowser();
     });
 
     afterAll(async () => {
