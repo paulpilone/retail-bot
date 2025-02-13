@@ -6,9 +6,16 @@ import { Browser } from 'puppeteer';
 import puppeteer from 'puppeteer-extra';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 
-import { isInStock } from './target-bot.js';
-import { TargetItem } from './types.js';
+import { isInStock as isInStockTarget } from './target-scraper.js';
+import { isInStock as isInStockBestBuy } from './best-buy-scraper.js';
 import { randomUserAgent } from './browser-utils.js';
+import  { items } from './items.js';
+import {
+  Item,
+  Listing,
+  LocalNotificationAttributes,
+  Retailers
+} from './types.js';
 
 const optionDefinitions = [
   { name: 'notify', alias: 'n', type: Boolean, defaultOption: false },
@@ -18,63 +25,21 @@ const options = commandLineArgs(optionDefinitions);
 const minScrapeDelay = 6000;
 const maxScrapeDelay = 12000;
 
-const browserConcurrency = 1;
+// Initial testing suggests puppeteer only processes the focused tab in a browser -- so
+// parallelizing items or listings with pMap doesn't improve performance. Changing these
+// values won't do much.
+const ITEM_CONCURRENCY = 1;
+const LISTING_CONCURRENCY = 1;
 
 // Configure Puppeteer to be stealthy
 // @ts-expect-error There are some weird import things going on with puppeteer extra and ESM
 puppeteer.use(StealthPlugin())
 
-// TODO: Read this from a file instead.
-const targetItems: TargetItem[] = [
-  {
-    // PE Surprise Box
-    title: 'PE Surprise Box',
-    url: 'https://www.target.com/p/2025-pokemon-scarlet-violet-s8-5-prismatic-evolutions-surprise-box/-/A-94336414',
-    id: '94336414',
-  },
-  {
-    // PE ETB
-    title: 'PE ETB',
-    url: 'https://www.target.com/p/2024-pok-scarlet-violet-s8-5-elite-trainer-box/-/A-93954435',
-    id: '93954435',
-  },
-  {
-    // PE Binder Collection
-    title: 'PE Binder Collection',
-    url: 'https://www.target.com/p/2025-pokemon-prismatic-evolutions-binder-collection/-/A-94300066',
-    id: '94300066',
-  },
-  {
-    // PE Booster Bundle
-    title: 'PE Booster Bundle',
-    url: 'https://www.target.com/p/pok-233-mon-trading-card-game-scarlet-38-violet-prismatic-evolutions-booster-bundle/-/A-93954446',
-    id: '93954446',
-  },
-  {
-    // PE Tins
-    title: 'PE Mini Tins',
-    url: 'https://www.target.com/p/pokemon-tcg-scarlet-violet-prismatic-evolutions-mini-tin-display-8ct-display/-/A-1001559212',
-    id: '1001559212',
-  },
-  {
-    // 151 Booster Bundle
-    title: '151 Booster Bundle',
-    url: 'https://www.target.com/p/pokemon-scarlet-violet-s3-5-booster-bundle-box/-/A-88897904',
-    id: '88897904',
-  },
-];
-
-interface NotificationAttributes {
-  title: string,
-  message: string,
-  url: string
-}
-
 /**
- * 
- * @param attrs 
+ *
+ * @param attrs
  */
-function notify(attrs: NotificationAttributes) {
+function sendInStockNotification(attrs: LocalNotificationAttributes) {
   notifier.notify({
     title: `${attrs.title}`,
     message: attrs.message,
@@ -82,6 +47,44 @@ function notify(attrs: NotificationAttributes) {
     sound: true,
     timeout: 30
   });
+}
+
+async function checkItemsInStock(browser: Browser, items: Item[]) {
+  await pMap(
+    items,
+    async (item: Item) => {
+      await pMap(
+        item.listings,
+        async(listing: Listing) => {
+          try {
+            console.log(`Checking ${item.title} at ${listing.retailer}...\n`);
+            let isInStock = false;
+            if (listing.retailer.toLowerCase() === Retailers.target.toLocaleLowerCase())
+              isInStock = await isInStockTarget(browser, listing);
+            else if (listing.retailer.toLowerCase() === Retailers.bestBuy.toLowerCase()) {
+              isInStock = await isInStockBestBuy(browser, listing);
+            }
+
+            if (isInStock) {
+              const message = `\nHurry! ${item.title} is in stock at ${listing.retailer}!\n`;
+              console.log(colors.green(message));
+
+              if (options.notify) {
+                sendInStockNotification({ title: item.title, message, ...listing });
+              }
+            } else {
+              console.log(colors.red(`\nNo rush. ${item.title} is still out of stock at ${listing.retailer}.\n`));
+            }
+
+          } catch (error) {
+            console.log(`Got an error checking availability: ${error}\n`);
+          }
+        },
+        { concurrency: LISTING_CONCURRENCY }
+      )
+    },
+    { concurrency: ITEM_CONCURRENCY }
+  );
 }
 
 // FIXME: There's some try/catch brokenness in here.
@@ -102,33 +105,7 @@ async function main() {
     });
 
     try {
-      await pMap(
-        targetItems,
-        async (item: TargetItem) => {
-          try {
-            console.log(`Checking ${item.title} at Target...\n`);
-            const isInStockTarget = await isInStock(browser, item);
-            
-            if (isInStockTarget) {
-              const message = `\nHurry! ${item.title} is in stock at Target!\n`;
-              console.log(colors.green(message));
-            
-              if (options.notify) {
-                notify({ ...item, message });
-              }
-            } else {
-              console.log(colors.red(`\nNo rush. ${item.title} is still out of stock.\n`));
-            }
-
-          } catch (error) {
-            console.log(`Got an error checking availability: ${error}\n`);
-          }
-        },
-        { concurrency: browserConcurrency }
-      );
-
-      // DEBUG Let's make sure our number of pages doesn't leak
-      console.log(`Number of browser pages: ${(await browser.pages()).length}`);
+      await checkItemsInStock(browser, items);
 
       const scrapeDelay = Math.floor(Math.random() * (maxScrapeDelay - minScrapeDelay + 1)) + minScrapeDelay;
       console.log(`Going to sleep for ${scrapeDelay}...\n`);
