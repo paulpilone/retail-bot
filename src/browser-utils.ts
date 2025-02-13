@@ -7,7 +7,7 @@ export function randomUserAgent(): string {
     'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
   ];
 
-  // Get a random index based on the length of the user agents array 
+  // Get a random index based on the length of the user agents array
   const randomUAIndex = Math.floor(Math.random() * userAgents.length);
 
   // Return a random user agent using the index above
@@ -16,11 +16,11 @@ export function randomUserAgent(): string {
 
 /**
  * FIXME: This was borred from the internet. Clean it up.
- * @param page 
- * @param timeout 
+ * @param page
+ * @param timeout
  */
 export async function waitForHTMLRendered(page: Page, timeout = 30000) {
-  const checkDurationMsecs = 1000;
+  const checkDurationMsecs = 1500;
   const maxChecks = timeout / checkDurationMsecs;
   let lastHTMLSize = 0;
   let checkCounts = 1;
