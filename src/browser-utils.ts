@@ -1,5 +1,30 @@
 import { Page } from "puppeteer";
+import puppeteer from 'puppeteer-extra';
+import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 
+// Configure Puppeteer to be stealthy
+// @ts-expect-error There are some weird import things going on with puppeteer extra and ESM
+puppeteer.use(StealthPlugin())
+
+export async function launchBrowser(browserOptions = {}) {
+  // @ts-expect-error There are some weird import things going on with puppeteer extra and ESM
+    return await puppeteer.launch({
+      headless: true,
+      args: [
+        `--no-sandbox`,
+        `--disable-setuid-sandbox`,
+        '--window-size=1920,1080',
+        `--user-agent=${randomUserAgent()}`,
+      ],
+      defaultViewport: null,
+      ...browserOptions,
+    });
+}
+
+/**
+ * 
+ * @returns 
+ */
 export function randomUserAgent(): string {
   // Array of random user agents
   const userAgents: string[] = [
@@ -31,9 +56,8 @@ export async function waitForHTMLRendered(page: Page, timeout = 30000) {
     const html = await page.content();
     const currentHTMLSize = html.length;
 
-    const bodyHTMLSize = await page.evaluate(() => document.body.innerHTML.length);
-
-    console.log('last: ', lastHTMLSize, ' <> curr: ', currentHTMLSize, " body html size: ", bodyHTMLSize);
+    // const bodyHTMLSize = await page.evaluate(() => document.body.innerHTML.length);
+    // console.log('last: ', lastHTMLSize, ' <> curr: ', currentHTMLSize, " body html size: ", bodyHTMLSize);
 
     if (lastHTMLSize != 0 && currentHTMLSize == lastHTMLSize)
       countStableSizeIterations++;
@@ -41,14 +65,11 @@ export async function waitForHTMLRendered(page: Page, timeout = 30000) {
       countStableSizeIterations = 0; //reset the counter
 
     if (countStableSizeIterations >= minStableSizeIterations) {
-      console.log("Page rendered fully..");
+      console.log("Page rendered...");
       break;
     }
 
     lastHTMLSize = currentHTMLSize;
-    await new Promise(resolve => setTimeout(
-      resolve,
-      checkDurationMsecs,
-    ));
+    await new Promise(resolve => setTimeout(resolve, checkDurationMsecs));
   }
 };
