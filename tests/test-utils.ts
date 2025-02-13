@@ -19,5 +19,5 @@ export async function launchTestBrowser(browserOptions = {}) {
     ],
     defaultViewport: null,
     ...browserOptions,
-});
+  });
 }
