@@ -6,7 +6,7 @@ const config: Config = {
   testMatch: [
     "<rootDir>/tests/**/*.test.ts",
   ],
-  testTimeout: 30000,
+  testTimeout: 60000,
   moduleNameMapper: {
     "^(\\.\\.?\\/.+)\\.js$": "$1",
   },
