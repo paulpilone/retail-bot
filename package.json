@@ -43,8 +43,10 @@
     "typescript-eslint": "^8.23.0"
   },
   "dependencies": {
+    "@aws-sdk/client-sns": "^3.744.0",
     "colors": "^1.4.0",
     "command-line-args": "^6.0.1",
+    "dotenv": "^16.4.7",
     "node-notifier": "^10.0.1",
     "p-map": "^7.0.3",
     "puppeteer": "^24.2.0",
