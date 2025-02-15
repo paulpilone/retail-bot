@@ -1,17 +1,51 @@
+import { PublishCommand, SNSClient } from '@aws-sdk/client-sns';
+import { mockClient } from 'aws-sdk-client-mock';
+
 import { sendSnsNotification } from '../src/notifier';
 import { Retailers } from '../src/types';
 
+const snsClientMock = mockClient(SNSClient);
+
 describe('notifier', () => {
   describe('sendSnsNotification', () => {
-    test.skip('it should publish an SNS message', async () => {
-      await sendSnsNotification({
+
+    beforeEach(() => {
+      snsClientMock.reset();
+    });
+    
+    test('it should publish an SNS message', async () => {
+      snsClientMock
+      .on(PublishCommand, {
+        TopicArn: 'arn:aws:sns:us-east-1:988767845816:retail-bot-notifier',
+        Message: 'Test notification - This is a test notification - www.google.com',
+        MessageAttributes: {
+          retailer: {
+            DataType: 'String',
+            StringValue: Retailers.target
+          }
+        } 
+      })
+      .resolves({
+        '$metadata': {
+            httpStatusCode: 200,
+            requestId: 'abc123',
+            extendedRequestId: undefined,
+            cfId: undefined,
+            attempts: 1,
+            totalRetryDelay: 0
+        },
+        MessageId: 'abc123'
+      });
+
+      const response = await sendSnsNotification({
         title: 'Test notification',
         message: 'This is a test notification',
         url: 'www.google.com',
         retailer: Retailers.target,
-      })
+      });
 
-      expect(true);
+      expect(response['MessageId']).toEqual('abc123');
     });
+
   })
 });

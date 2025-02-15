@@ -2,16 +2,21 @@ import notifier from 'node-notifier';
 
 import config from './config.js';
 import { NotificationAttributes, NotificationType } from './types.js';
-import { snsClient } from './aws/sns-client.js';
-import { PublishCommand } from '@aws-sdk/client-sns';
+import snsClient from './aws/sns-client.js';
+import { PublishBatchCommandOutput } from '@aws-sdk/client-sns';
 
-export async function sendNotification(notificationType: string, attrs: NotificationAttributes) {
-  if (notificationType === NotificationType.local) {
+/**
+ * 
+ * @param notificationType 
+ * @param attrs 
+ */
+export async function sendNotification(notificationType: string[], attrs: NotificationAttributes) {
+  if (notificationType.includes(NotificationType.local)) {
     sendLocalNotification(attrs);
-  } else if (notificationType === NotificationType.sns) {
+  } 
+  
+  if (notificationType.includes(NotificationType.sns)) {
     await sendSnsNotification(attrs);
-  } else {
-    console.log(`Unrecognized notification type ${notificationType}`);
   }
 }
 
@@ -19,8 +24,11 @@ export async function sendNotification(notificationType: string, attrs: Notifica
  * 
  * @param attrs 
  */
-export async function sendSnsNotification(attrs: NotificationAttributes) {
-  const response = await snsClient.send(new PublishCommand({
+export async function sendSnsNotification(
+  attrs: NotificationAttributes
+): Promise<PublishBatchCommandOutput> {
+  
+  const response = await snsClient.publish({
     TopicArn: config.notificationSnsTopicArn,
     Message: `${attrs.title} - ${attrs.message} - ${attrs.url}`,
     MessageAttributes: {
@@ -29,9 +37,11 @@ export async function sendSnsNotification(attrs: NotificationAttributes) {
         StringValue: attrs.retailer,
       }
     }
-  }));
+  });
 
   console.log(`SNS response: ${JSON.stringify(response)}`);
+
+  return response;
 };
 
 /**

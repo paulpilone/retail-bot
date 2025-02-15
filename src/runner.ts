@@ -15,14 +15,14 @@ import {
 } from './types.js';
 
 const optionDefinitions = [
-  { name: 'notificationType', alias: 'n', type: String },
+  { name: 'notificationType', alias: 'n', multiple: true, type: String },
   { name: 'retailer', alias: 'r', type: String }
 ];
 const options = commandLineArgs(optionDefinitions);
 console.log(`options: ${JSON.stringify(options)}`);
 
-const minScrapeDelay = 6000;
-const maxScrapeDelay = 12000;
+const minScrapeDelay = 1000;
+const maxScrapeDelay = 3000;
 
 // Initial testing suggests puppeteer only processes the focused tab in a browser -- so
 // parallelizing items or listings with pMap doesn't improve performance. Changing these

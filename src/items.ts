@@ -85,13 +85,23 @@ export const items: Item[] = [
         url: 'https://www.target.com/p/pokemon-scarlet-violet-s3-5-booster-bundle-box/-/A-88897904',
         id: '88897904',
       },
-      {
-        retailer: Retailers.bestBuy,
-        url: 'https://www.bestbuy.com/site/pokemon-trading-card-game-151-6pk-booster-bundle/6548371.p?skuId=6548371',
-        id: '6548371',
-      }
+      // {
+      //   retailer: Retailers.bestBuy,
+      //   url: 'https://www.bestbuy.com/site/pokemon-trading-card-game-151-6pk-booster-bundle/6548371.p?skuId=6548371',
+      //   id: '6548371',
+      // }
     ]
   },
+  {
+    title: 'Prismatic Evolutions 2 Pack Blister',
+    listings: [
+      {
+        retailer: Retailers.bestBuy,
+        url: 'https://www.bestbuy.com/site/pokemon-trading-card-game-scarlet-violet-prismatic-evolutions-2-pack-blister/6607716.p?skuId=6607716',
+        id: '6607716'
+      }
+    ]
+  }
   // {
   //   title: '151 Blooming Waters',
   //   listings: [
