@@ -6,6 +6,8 @@ import { Retailers } from '../src/types';
 
 const snsClientMock = mockClient(SNSClient);
 
+import config from './config';
+
 describe('notifier', () => {
   describe('sendSnsNotification', () => {
 
@@ -16,7 +18,7 @@ describe('notifier', () => {
     test('it should publish an SNS message', async () => {
       snsClientMock
       .on(PublishCommand, {
-        TopicArn: 'arn:aws:sns:us-east-1:988767845816:retail-bot-notifier',
+        TopicArn: config.notificationSnsTopicArn,
         Message: 'Test notification - This is a test notification - www.google.com',
         MessageAttributes: {
           retailer: {
