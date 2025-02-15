@@ -1,28 +1,28 @@
 import commandLineArgs from 'command-line-args';
 import colors from 'colors';
-import notifier from 'node-notifier';
 import pMap from 'p-map';
 import { Browser } from 'puppeteer';
 
-import { isInStock as isInStockTarget } from './target-scraper.js';
 import { isInStock as isInStockBestBuy } from './best-buy-scraper.js';
+import { isInStock as isInStockTarget } from './target-scraper.js';
+import { items } from './items.js';
 import { launchBrowser } from './browser-utils.js';
-import  { items } from './items.js';
+import { sendNotification } from './notifier.js'
 import {
   Item,
   Listing,
-  LocalNotificationAttributes,
   Retailers
 } from './types.js';
 
 const optionDefinitions = [
-  { name: 'notify', alias: 'n', type: Boolean, defaultOption: false },
+  { name: 'notificationType', alias: 'n', multiple: true, type: String },
   { name: 'retailer', alias: 'r', type: String }
 ];
 const options = commandLineArgs(optionDefinitions);
+console.log(`options: ${JSON.stringify(options)}`);
 
-const minScrapeDelay = 6000;
-const maxScrapeDelay = 12000;
+const minScrapeDelay = 1000;
+const maxScrapeDelay = 3000;
 
 // Initial testing suggests puppeteer only processes the focused tab in a browser -- so
 // parallelizing items or listings with pMap doesn't improve performance. Changing these
@@ -31,19 +31,10 @@ const ITEM_CONCURRENCY = 1;
 const LISTING_CONCURRENCY = 1;
 
 /**
- *
- * @param attrs
+ * 
+ * @param browser 
+ * @param items 
  */
-function sendInStockNotification(attrs: LocalNotificationAttributes) {
-  notifier.notify({
-    title: `${attrs.title}`,
-    message: attrs.message,
-    open: attrs.url,
-    sound: true,
-    timeout: 30
-  });
-}
-
 async function checkItemsInStock(browser: Browser, items: Item[]) {
   await pMap(
     items,
@@ -68,8 +59,11 @@ async function checkItemsInStock(browser: Browser, items: Item[]) {
               const message = `\nHurry! ${item.title} is in stock at ${listing.retailer}!\n`;
               console.log(colors.green(message));
 
-              if (options.notify) {
-                sendInStockNotification({ title: item.title, message, ...listing });
+              if (options.notificationType) {
+                await sendNotification(
+                  options.notificationType, 
+                  { title: item.title, message, ...listing }
+                );
               }
             } else {
               console.log(colors.red(`\nNo rush. ${item.title} is still out of stock at ${listing.retailer}.\n`));

@@ -14,17 +14,17 @@ export async function isInStock(browser: Browser, listing: Listing): Promise<boo
     page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36')
 
     // Rejecting images seems to cause Target pages to hang...
-    // await page.setRequestInterception(true);
-    // page.on('request', request => {
-    //   if (request.resourceType() === 'image') {
-    //     request.abort();
-    //   } else {
-    //     request.continue();
-    //   }
-    // });
+    await page.setRequestInterception(true);
+    page.on('request', request => {
+      if (request.resourceType() === 'image') {
+        request.abort();
+      } else {
+        request.continue();
+      }
+    });
 
     try {
-        await page.goto(listing.url, { waitUntil: 'networkidle0' });
+        await page.goto(listing.url, { waitUntil: 'networkidle2' });
         await waitForHTMLRendered(page);
 
         try {
