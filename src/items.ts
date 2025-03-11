@@ -25,11 +25,11 @@ export const items: Item[] = [
         url: 'https://www.target.com/p/2024-pok-scarlet-violet-s8-5-elite-trainer-box/-/A-93954435',
         id: '93954435',
       },
-      {
-        retailer: Retailers.bestBuy,
-        url: 'https://www.bestbuy.com/site/pokemon-trading-card-game-scarlet-violet-prismatic-evolutions-elite-trainer-box/6606082.p?skuId=6606082',
-        id: '6606082'
-      }
+      // {
+      //   retailer: Retailers.bestBuy,
+      //   url: 'https://www.bestbuy.com/site/pokemon-trading-card-game-scarlet-violet-prismatic-evolutions-elite-trainer-box/6606082.p?skuId=6606082',
+      //   id: '6606082'
+      // }
     ]
   },
   {
@@ -40,11 +40,11 @@ export const items: Item[] = [
         url: 'https://www.target.com/p/2025-pokemon-prismatic-evolutions-binder-collection/-/A-94300066',
         id: '94300066',
       },
-      {
-        retailer: Retailers.bestBuy,
-        url: 'https://www.bestbuy.com/site/pokemon-trading-card-game-scarlet-violet-prismatic-evolutions-binder-collection/6606079.p?skuId=6606079',
-        id: '6606079',
-      }
+      // {
+      //   retailer: Retailers.bestBuy,
+      //   url: 'https://www.bestbuy.com/site/pokemon-trading-card-game-scarlet-violet-prismatic-evolutions-binder-collection/6606079.p?skuId=6606079',
+      //   id: '6606079',
+      // }
     ]
   },
   {
@@ -101,7 +101,7 @@ export const items: Item[] = [
         id: '6607716'
       }
     ]
-  }
+  },
   // {
   //   title: '151 Blooming Waters',
   //   listings: [
@@ -112,4 +112,39 @@ export const items: Item[] = [
   //     }
   //   ]
   // }
+  {
+    title: 'Prismatic Evolutions Accessory Pouch',
+    listings: [
+      {
+        retailer: Retailers.target,
+        url: 'https://www.target.com/p/2025-pokemon-prismatic-evolutions-accessory-pouch-special-collection/-/A-94300053',
+        id: '94300053',
+      },
+      {
+        retailer: Retailers.bestBuy,
+        url: 'https://www.bestbuy.com/site/pokemon-trading-card-game-scarlet-violet-prismatic-evolutions-accessory-pouch-special-collection/6609202.p?skuId=6609202',
+        id: '6609202',
+      }
+    ]
+  },
+  {
+    title: 'Prismatic Evolutions Ultra-Premium Collection',
+    listings: [
+      {
+        retailer: Retailers.bestBuy,
+        url: 'https://www.bestbuy.com/site/pokemon-trading-card-game-scarlet-violet-prismatic-evolutions-super-premium-collection/6621081.p?skuId=6621081',
+        id: '6621081',
+      }
+    ]
+  },
+  {
+    title: 'Journey Together Booster Bundles',
+    listings: [
+      {
+        retailer: Retailers.target,
+        url: 'https://www.target.com/p/pok-233-mon-trading-card-game-scarlet-38-violet-8212-journey-together-booster-bundle/-/A-94300074#lnk=sametabhttps://www.target.com/p/pok-233-mon-trading-card-game-scarlet-38-violet-8212-journey-together-booster-bundle/-/A-94300074',
+        id: '94300074',
+      }
+    ]
+  }
 ];

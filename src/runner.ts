@@ -5,6 +5,7 @@ import { Browser } from 'puppeteer';
 
 import { isInStock as isInStockBestBuy } from './best-buy-scraper.js';
 import { isInStock as isInStockTarget } from './target-scraper.js';
+// import { isInStock as isInStockWalmart } from './walmart-scraper.js';
 import { items } from './items.js';
 import { launchBrowser } from './browser-utils.js';
 import { sendNotification } from './notifier.js'
@@ -53,7 +54,10 @@ async function checkItemsInStock(browser: Browser, items: Item[]) {
               isInStock = await isInStockTarget(browser, listing);
             else if (listing.retailer.toLowerCase() === Retailers.bestBuy.toLowerCase()) {
               isInStock = await isInStockBestBuy(browser, listing);
-            }
+            } 
+            // } else if (listing.retailer.toLowerCase() === Retailers.walmart.toLowerCase()) {
+            //   isInStock = await isInStockWalmart(browser, listing);
+            // }
 
             if (isInStock) {
               const message = `\nHurry! ${item.title} is in stock at ${listing.retailer}!\n`;
@@ -86,7 +90,7 @@ async function checkItemsInStock(browser: Browser, items: Item[]) {
 async function main() {
   while (true) {
     const browser = await launchBrowser();
-
+  
     try {
       await checkItemsInStock(browser, items);
 
