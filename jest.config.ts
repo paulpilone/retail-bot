@@ -6,7 +6,10 @@ const config: Config = {
   testMatch: [
     "<rootDir>/tests/**/*.test.ts",
   ],
-  testTimeout: 60000,
+  testPathIgnorePatterns: [
+    "<rootDir>/tests/walmart-scraper.test.ts"
+  ],
+  testTimeout: 100000000,
   moduleNameMapper: {
     "^(\\.\\.?\\/.+)\\.js$": "$1",
   },

@@ -41,6 +41,6 @@ export async function isInStock(browser: Browser, listing: Listing): Promise<boo
 
       throw error;
   } finally {
-      page.close();
+      await page.close();
   }
 };

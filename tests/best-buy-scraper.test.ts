@@ -34,15 +34,15 @@ describe('best-buy-scraper', () => {
       expect(result).toBe(true);
     });
 
-    test('it should respond false for an in stock item', async () => {
+    test('it should respond false for an out of stock item', async () => {
       const result = await isInStock(
           browser,
           {
-              // Test in stock item (we hope it's actually out of stock)
+              // Test out stock item (we hope it's actually out of stock)
               // title: 'Out of Stock Item',
               retailer: Retailers.bestBuy,
-              url: 'https://www.bestbuy.com/site/pokemon-trading-card-game-scarlet-violet-prismatic-evolutions-binder-collection/6606079.p?skuId=6606079',
-              id: '6606079',
+              url: 'https://www.bestbuy.com/site/pokemon-trading-card-game-scarlet-violet-prismatic-evolutions-surprise-box/6607717.p?skuId=6607717',
+              id: '6607717',
           },
       );
 
