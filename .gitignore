@@ -29,4 +29,5 @@ node_modules/
 .vscode-test
 
 # Test Artifacts
+tests/fixtures/apis/*
 tests/screenshots/**/*.png
