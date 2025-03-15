@@ -94,9 +94,9 @@ async function main() {
     try {
       await checkItemsInStock(browser, items);
 
-      const scrapeDelay = Math.floor(Math.random() * (maxScrapeDelay - minScrapeDelay + 1)) + minScrapeDelay;
-      console.log(`Going to sleep for ${scrapeDelay}...\n`);
-      await new Promise((resolve) => setTimeout(resolve, scrapeDelay));
+      // const scrapeDelay = Math.floor(Math.random() * (maxScrapeDelay - minScrapeDelay + 1)) + minScrapeDelay;
+      // console.log(`Going to sleep for ${scrapeDelay}...\n`);
+      // await new Promise((resolve) => setTimeout(resolve, scrapeDelay));
     } catch (err) {
       console.log(`Got an error: ${err}`);
     } finally {

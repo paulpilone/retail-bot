@@ -50,11 +50,11 @@ export const items: Item[] = [
   {
     title: 'Prismatic Evolutions Booster Bundle',
     listings: [
-      {
-        retailer: Retailers.target,
-        url: 'https://www.target.com/p/pok-233-mon-trading-card-game-scarlet-38-violet-prismatic-evolutions-booster-bundle/-/A-93954446',
-        id: '93954446',
-      },
+      // {
+      //   retailer: Retailers.target,
+      //   url: 'https://www.target.com/p/pok-233-mon-trading-card-game-scarlet-38-violet-prismatic-evolutions-booster-bundle/-/A-93954446',
+      //   id: '93954446',
+      // },
       {
         retailer: Retailers.bestBuy,
         url: 'https://www.bestbuy.com/site/pokemon-trading-card-game-scarlet-violet-prismatic-evolutions-booster-bundle/6608206.p?skuId=6608206',
@@ -128,12 +128,17 @@ export const items: Item[] = [
     ]
   },
   {
-    title: 'Prismatic Evolutions Ultra-Premium Collection',
+    title: 'Prismatic Evolutions Super Premium Collection',
     listings: [
       {
         retailer: Retailers.bestBuy,
         url: 'https://www.bestbuy.com/site/pokemon-trading-card-game-scarlet-violet-prismatic-evolutions-super-premium-collection/6621081.p?skuId=6621081',
         id: '6621081',
+      },
+      {
+        retailer: Retailers.target,
+        url: 'https://www.target.com/p/2025-pok-233-mon-prismatic-evolutions-super-premium-collection/-/A-94300072',
+        id: '94300072',
       }
     ]
   },
